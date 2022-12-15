@@ -129,14 +129,13 @@ extension YTLiveRequest {
                                    startDateTime: Date,
                                    privacy: String?,
                                    enableAutoStop: Bool?,
-                                   enableEmbed: Bool?,
                                    completion: @escaping (Result<LiveBroadcastStreamModel, YTError>) -> Void) {
         getHeaders { headers in
             guard let headers = headers else {
                 completion(.failure(.message("OAuth token is not presented")))
                 return
             }
-            let jsonBody = CreateLiveBroadcastBody(title: title, description: description, startDateTime: startDateTime, privacy: privacy, enableAutoStop: enableAutoStop, enableEmbed: enableEmbed)
+            let jsonBody = CreateLiveBroadcastBody(title: title, description: description, startDateTime: startDateTime, privacy: privacy, enableAutoStop: enableAutoStop)
             guard let jsonData = try? JSONEncoder().encode(jsonBody),
                   let jsonString = String(data: jsonData, encoding: .utf8) else {
                 completion(.failure(.message("Failed while preparing request")))

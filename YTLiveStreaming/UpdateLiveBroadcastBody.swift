@@ -86,17 +86,16 @@ struct CreateLiveBroadcastBody: Codable {
     
     struct ContentDetails: Codable {
         var enableAutoStop: Bool
-        var enableEmbed: Bool
     }
 
     let snippet: Snipped
     let status: Status
     let contentDetails: ContentDetails
 
-    init(title: String, description: String, startDateTime: Date, privacy: String? = nil, enableAutoStop: Bool? = nil, enableEmbed: Bool? = nil) {
+    init(title: String, description: String, startDateTime: Date, privacy: String? = nil, enableAutoStop: Bool? = nil) {
         snippet = Snipped(title: title, description: description, startDateTime: startDateTime)
         status = Status(privacyStatus: privacy ?? "public", selfDeclaredMadeForKids: false)
-        contentDetails = ContentDetails(enableAutoStop: enableAutoStop ?? false, enableEmbed: enableEmbed ?? false)
+        contentDetails = ContentDetails(enableAutoStop: enableAutoStop ?? false)
     }
 }
 

@@ -125,6 +125,7 @@ extension YTLiveRequest {
     // https://developers.google.com/youtube/v3/live/docs/liveBroadcasts/insert
     // Creates a broadcast.
     class func createLiveBroadcast(_ title: String,
+                                   _ description: String,
                                    startDateTime: Date,
                                    privacy: String?,
                                    enableAutoStop: Bool?,
@@ -134,7 +135,7 @@ extension YTLiveRequest {
                 completion(.failure(.message("OAuth token is not presented")))
                 return
             }
-            let jsonBody = CreateLiveBroadcastBody(title: title, startDateTime: startDateTime, privacy: privacy, enableAutoStop: enableAutoStop)
+            let jsonBody = CreateLiveBroadcastBody(title: title, description: description, startDateTime: startDateTime, privacy: privacy, enableAutoStop: enableAutoStop)
             guard let jsonData = try? JSONEncoder().encode(jsonBody),
                   let jsonString = String(data: jsonData, encoding: .utf8) else {
                 completion(.failure(.message("Failed while preparing request")))

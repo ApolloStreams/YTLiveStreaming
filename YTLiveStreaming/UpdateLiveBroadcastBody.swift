@@ -24,7 +24,7 @@ struct UpdateLiveBroadcastBody: Codable {
         var enableContentEncryption: Bool
         var enableEmbed: Bool
         var recordFromStart: Bool
-        var startWithSlate: Bool
+//        var startWithSlate: Bool
         var enableAutoStop: Bool
 
         init(contentDetails: LiveBroadcastStreamModel.ContentDetails) {
@@ -34,7 +34,7 @@ struct UpdateLiveBroadcastBody: Codable {
             enableContentEncryption = contentDetails.enableContentEncryption
             enableEmbed = contentDetails.enableEmbed
             recordFromStart = contentDetails.recordFromStart
-            startWithSlate = contentDetails.startWithSlate
+//            startWithSlate = contentDetails.startWithSlate
             enableAutoStop = contentDetails.enableAutoStop ?? false
         }
     }

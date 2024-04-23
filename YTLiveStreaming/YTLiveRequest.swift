@@ -449,6 +449,7 @@ extension YTLiveRequest {
                         let code = error.responseCode ?? -1
                         let message = error.errorDescription ?? error.localizedDescription
                         completion(.failure(.systemMessage(code, message)))
+                        return
                       }
                       guard let data = response.data else {
                         completion(.failure(.message("createLiveStream response is empty")))

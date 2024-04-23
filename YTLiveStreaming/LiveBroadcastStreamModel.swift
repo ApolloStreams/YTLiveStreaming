@@ -70,7 +70,6 @@ public struct LiveBroadcastStreamModel: Codable {
     }
 
     public struct ContentDetails: Codable {
-        public let startWithSlate: Bool
         public let recordFromStart: Bool
         public let closedCaptionsType: String
         public let enableLowLatency: Bool
@@ -96,3 +95,6 @@ public struct LiveBroadcastStreamModel: Codable {
         public var privacyStatus: String
     }
 }
+
+
+

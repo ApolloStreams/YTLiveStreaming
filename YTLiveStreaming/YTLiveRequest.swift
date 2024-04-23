@@ -445,9 +445,25 @@ extension YTLiveRequest {
                             completion(.failure(.message(message)))
                         }
                     case .failure(let error):
+                      if let statusCode = response.response?.statusCode {
+                        if let data = response.data {
+                          do {
+                            let json = try JSON(data: data)
+                            let errorMessage = json["error"]["message"].stringValue
+                            let errorType = json["error"]["errors"][0]["reason"].stringValue
+                            let apiError = "\(statusCode): \(errorType) - \(errorMessage)"
+                            completion(.failure(.apiError(statusCode, apiError)))
+                          } catch {
+                            completion(.failure(.systemError(statusCode, error.localizedDescription)))
+                          }
+                        } else {
+                          completion(.failure(.systemError(statusCode, error.localizedDescription)))
+                        }
+                      } else {
                         let code = error.responseCode ?? -1
                         let message = error.errorDescription ?? error.localizedDescription
-                        completion(.failure(.systemMessage(code, message)))
+                        completion(.failure(.systemError(code, message)))
+                      }
                     }
             }.cURLDescription { (description) in
                 print("\n====== REQUEST =======\n\(description)\n==============\n")

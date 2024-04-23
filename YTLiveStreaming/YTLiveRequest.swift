@@ -454,15 +454,15 @@ extension YTLiveRequest {
                             let apiError = "\(statusCode): \(errorType) - \(errorMessage)"
                             completion(.failure(.apiError(statusCode, apiError)))
                           } catch {
-                            completion(.failure(.systemError(statusCode, error.localizedDescription)))
+                            completion(.failure(.systemMessage(statusCode, error.localizedDescription)))
                           }
                         } else {
-                          completion(.failure(.systemError(statusCode, error.localizedDescription)))
+                          completion(.failure(.systemMessage(statusCode, error.localizedDescription)))
                         }
                       } else {
                         let code = error.responseCode ?? -1
                         let message = error.errorDescription ?? error.localizedDescription
-                        completion(.failure(.systemError(code, message)))
+                        completion(.failure(.systemMessage(code, message)))
                       }
                     }
             }.cURLDescription { (description) in

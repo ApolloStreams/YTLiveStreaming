@@ -16,8 +16,8 @@ public enum YTError: Error {
             return message
         case .systemMessage(let code, let message):
             return "System error: \(code)\n\(message)"
-        }
         case .apiError(let code, let message):
           return "Api error: \(code)\n\(message)"
+        }
     }
 }

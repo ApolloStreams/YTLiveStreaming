@@ -130,7 +130,7 @@ extension YTLiveStreaming {
 
     public func startBroadcast(_ broadcast: LiveBroadcastStreamModel,
                                delegate: LiveStreamTransitioning,
-                               completion: @escaping (String?, String?, Date?) -> Void) {
+                               completion: @escaping (String?, String?, Date?, YTError?) -> Void) {
         let broadcastId = broadcast.id
         let liveStreamId = broadcast.contentDetails?.boundStreamId ?? ""
         if !broadcastId.isEmpty && !liveStreamId.isEmpty {
@@ -153,21 +153,22 @@ extension YTLiveStreaming {
                             LiveLauncher.sharedInstance.youTubeWorker = self
                             LiveLauncher.sharedInstance.delegate = delegate
                             LiveLauncher.sharedInstance.launchBroadcast(broadcast: broadcast, stream: liveStream)
-                            completion(streamName, streamUrl, scheduledStartTime)
+                            completion(streamName, streamUrl, scheduledStartTime, nil)
                         case .failure(let error):
-                            print(error.message())
-                            completion(nil, nil, nil)
+                          print(error.message())
+                          completion(nil, nil, nil, YTError.message(error.message()))
                         }
                     })
                 case .failure(let error):
                     print(error.message())
                     print("Please xheck broadcast.youtubeId. It has to contain broadcast Id and live stream Id")
-                    completion(nil, nil, nil)
+                  completion(nil, nil, nil, YTError.message(error.message()))
                 }
             }
         } else {
-            print("Please check broadcast.youtubeId. It has to contain broadcast Id and live stream Id")
-            completion(nil, nil, nil)
+            let message = "Please check broadcast.youtubeId. It has to contain broadcast Id and live stream Id"
+            print(message)
+            completion(nil, nil, nil, YTError.message(message))
         }
     }
 

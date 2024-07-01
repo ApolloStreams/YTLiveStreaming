@@ -156,13 +156,13 @@ extension YTLiveStreaming {
                             completion(streamName, streamUrl, scheduledStartTime, nil)
                         case .failure(let error):
                           print(error.message())
-                          completion(nil, nil, nil, YTError.message(error.message()))
+                          completion(nil, nil, nil, error)
                         }
                     })
                 case .failure(let error):
                     print(error.message())
                     print("Please xheck broadcast.youtubeId. It has to contain broadcast Id and live stream Id")
-                  completion(nil, nil, nil, YTError.message(error.message()))
+                  completion(nil, nil, nil, error)
                 }
             }
         } else {

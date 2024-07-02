@@ -200,7 +200,7 @@ extension YTLiveStreaming {
 
     public func transitionBroadcast(_ broadcast: LiveBroadcastStreamModel,
                                     toStatus: String,
-                                    completion: @escaping (Bool) -> Void) {
+                                    completion: @escaping (Bool, YTError?) -> Void) {
         // complete – The broadcast is over. YouTube stops transmitting video.
         // live – The broadcast is visible to its audience. YouTube transmits video to the broadcast's
         // monitor stream and its broadcast stream.
@@ -209,10 +209,10 @@ extension YTLiveStreaming {
             switch result {
             case .success:
                 print("Our broadcast in the \(toStatus) status!")
-                completion(true)
+                completion(true, nil)
             case .failure(let error):
                 print(error.message)
-                completion(false)
+                completion(false, error)
             }
         }
     }
@@ -273,15 +273,15 @@ extension YTLiveStreaming {
     }
 
     public func transitionBroadcastToLiveState(liveBroadcast: LiveBroadcastStreamModel,
-                                               liveState: @escaping (Bool) -> Void) {
-        self.transitionBroadcast(liveBroadcast, toStatus: "live") { success in
+                                               liveState: @escaping (Bool, YTError?) -> Void) {
+        self.transitionBroadcast(liveBroadcast, toStatus: "live") { success, error in
             if success {
                 print("Transition to the LIVE status was made successfully")
-                liveState(true)
+                liveState(true, nil)
             } else {
                 print("Failed transition to the LIVE status!")
-                liveState(false)
-                self.transitionBroadcast(liveBroadcast, toStatus: "testing", completion: { success in
+                liveState(false, error)
+                self.transitionBroadcast(liveBroadcast, toStatus: "testing", completion: { success, error in
                     if success {
                         print("We in the testing status!")
                     }

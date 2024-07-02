@@ -77,9 +77,11 @@ class LiveLauncher: NSObject {
          if liveStatus {
             self.isLiveStreaming = true
          } else {
-            self.transitionToLive { success in
+            self.transitionToLive { success, err in
                if success {
                   self.isLiveStreaming = true
+               } else if let err = err {
+                 self.delegate?.returnAnError?(error: err.message())
                }
             }
          }
@@ -119,7 +121,7 @@ class LiveLauncher: NSObject {
       })
    }
 
-   fileprivate func transitionToLive(completion: @escaping (Bool) -> Void) {
+   fileprivate func transitionToLive(completion: @escaping (Bool, YTError?) -> Void) {
       guard let liveBroadcast = self.liveBroadcast else {
          return
       }

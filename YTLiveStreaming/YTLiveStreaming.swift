@@ -130,7 +130,7 @@ extension YTLiveStreaming {
 
     public func startBroadcast(_ broadcast: LiveBroadcastStreamModel,
                                delegate: LiveStreamTransitioning,
-                               completion: @escaping (String?, String?, Date?) -> Void) {
+                               completion: @escaping (String?, String?, Date?, YTError?) -> Void) {
         let broadcastId = broadcast.id
         let liveStreamId = broadcast.contentDetails?.boundStreamId ?? ""
         if !broadcastId.isEmpty && !liveStreamId.isEmpty {
@@ -153,34 +153,35 @@ extension YTLiveStreaming {
                             LiveLauncher.sharedInstance.youTubeWorker = self
                             LiveLauncher.sharedInstance.delegate = delegate
                             LiveLauncher.sharedInstance.launchBroadcast(broadcast: broadcast, stream: liveStream)
-                            completion(streamName, streamUrl, scheduledStartTime)
+                            completion(streamName, streamUrl, scheduledStartTime, nil)
                         case .failure(let error):
-                            print(error.message())
-                            completion(nil, nil, nil)
+                          print(error.message())
+                          completion(nil, nil, nil, error)
                         }
                     })
                 case .failure(let error):
                     print(error.message())
                     print("Please xheck broadcast.youtubeId. It has to contain broadcast Id and live stream Id")
-                    completion(nil, nil, nil)
+                  completion(nil, nil, nil, error)
                 }
             }
         } else {
-            print("Please check broadcast.youtubeId. It has to contain broadcast Id and live stream Id")
-            completion(nil, nil, nil)
+            let message = "Please check broadcast.youtubeId. It has to contain broadcast Id and live stream Id"
+            print(message)
+            completion(nil, nil, nil, YTError.message(message))
         }
     }
 
-    public func completeBroadcast(_ broadcast: LiveBroadcastStreamModel, completion: @escaping (Bool) -> Void) {
+    public func completeBroadcast(_ broadcast: LiveBroadcastStreamModel, completion: @escaping (Bool, YTError?) -> Void) {
         LiveLauncher.sharedInstance.stopBroadcast()
         // complete – The broadcast is over. YouTube stops transmitting video.
         YTLiveRequest.transitionLiveBroadcast(broadcast.id, broadcastStatus: "complete") { result in
             switch result {
             case .success:
-                completion(true)
+                completion(true, nil)
             case .failure(let error):
                 print(error.message())
-                completion(false)
+                completion(false, error)
             }
         }
     }
@@ -199,7 +200,7 @@ extension YTLiveStreaming {
 
     public func transitionBroadcast(_ broadcast: LiveBroadcastStreamModel,
                                     toStatus: String,
-                                    completion: @escaping (Bool) -> Void) {
+                                    completion: @escaping (Bool, YTError?) -> Void) {
         // complete – The broadcast is over. YouTube stops transmitting video.
         // live – The broadcast is visible to its audience. YouTube transmits video to the broadcast's
         // monitor stream and its broadcast stream.
@@ -208,17 +209,17 @@ extension YTLiveStreaming {
             switch result {
             case .success:
                 print("Our broadcast in the \(toStatus) status!")
-                completion(true)
+                completion(true, nil)
             case .failure(let error):
                 print(error.message)
-                completion(false)
+                completion(false, error)
             }
         }
     }
 
     public func getStatusBroadcast(_ broadcast: LiveBroadcastStreamModel,
                                    stream: LiveStreamModel,
-                                   completion: @escaping (String?, String?, String?) -> Void) {
+                                   completion: @escaping (String?, String?, String?, YTError?) -> Void) {
         YTLiveRequest.getLiveBroadcast(broadcastId: broadcast.id, completion: { result in
             switch result {
             case .success(let broadcast):
@@ -258,29 +259,29 @@ extension YTLiveStreaming {
                         //  noData – YouTube's live streaming backend servers do not have any information
                         //           about the stream's health status.
                         let healthStatus = liveStream.status.healthStatus.status
-                        completion(broadcastStatus, streamStatus, healthStatus)
+                        completion(broadcastStatus, streamStatus, healthStatus, nil)
                     case .failure(let error):
                         print(error.message())
-                        completion(nil, nil, nil)
+                        completion(nil, nil, nil, error)
                     }
                 })
             case .failure(let error):
                 print(error.message())
-                completion(nil, nil, nil)
+                completion(nil, nil, nil, error)
             }
         })
     }
 
     public func transitionBroadcastToLiveState(liveBroadcast: LiveBroadcastStreamModel,
-                                               liveState: @escaping (Bool) -> Void) {
-        self.transitionBroadcast(liveBroadcast, toStatus: "live") { success in
+                                               liveState: @escaping (Bool, YTError?) -> Void) {
+        self.transitionBroadcast(liveBroadcast, toStatus: "live") { success, error in
             if success {
                 print("Transition to the LIVE status was made successfully")
-                liveState(true)
+                liveState(true, nil)
             } else {
                 print("Failed transition to the LIVE status!")
-                liveState(false)
-                self.transitionBroadcast(liveBroadcast, toStatus: "testing", completion: { success in
+                liveState(false, error)
+                self.transitionBroadcast(liveBroadcast, toStatus: "testing", completion: { success, error in
                     if success {
                         print("We in the testing status!")
                     }

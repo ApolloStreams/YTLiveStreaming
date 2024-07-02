@@ -10,6 +10,7 @@ import Foundation
 @objc public protocol LiveStreamTransitioning: AnyObject {
    @objc optional func didTransitionToLiveStatus()
    @objc optional func didTransitionTo(broadcastStatus: String?, streamStatus: String?, healthStatus: String?)
+   @objc optional func returnAnError(error: String?)
 }
 
 class LiveLauncher: NSObject {
@@ -72,20 +73,25 @@ class LiveLauncher: NSObject {
    }
 
    @objc func liveVideoStatusRequestTickTimer() {
-      statusRequest { liveStatus in
+      statusRequest { liveStatus, error in
          if liveStatus {
             self.isLiveStreaming = true
          } else {
-            self.transitionToLive { success in
+            self.transitionToLive { success, err in
                if success {
                   self.isLiveStreaming = true
+               } else if let err = err {
+                 self.delegate?.returnAnError?(error: err.message())
                }
             }
          }
+        if let error = error {
+          self.delegate?.returnAnError?(error: error.message())
+        }
       }
    }
 
-   fileprivate func statusRequest(completion: @escaping (Bool) -> Void) {
+   fileprivate func statusRequest(completion: @escaping (Bool, YTError?) -> Void) {
       guard !self.isLiveStreaming else {
          return
       }
@@ -97,23 +103,25 @@ class LiveLauncher: NSObject {
       }
       self.youTubeWorker?.getStatusBroadcast(liveBroadcast,
                                              stream: liveStream,
-                                             completion: { (broadcastStatus, streamStatus, healthStatus) in
+                                             completion: { (broadcastStatus, streamStatus, healthStatus, error) in
          if let broadcastStatus = broadcastStatus, let streamStatus = streamStatus, let healthStatus = healthStatus {
             if broadcastStatus == "live" || broadcastStatus == "liveStarting" {
-               completion(true)
+               completion(true, nil)
             } else {
                self.delegate?.didTransitionTo?(
                 broadcastStatus: broadcastStatus,
                 streamStatus: streamStatus,
                 healthStatus: healthStatus
                )
-               completion(false)
+               completion(false, nil)
             }
+         } else if let error = error {
+           completion(false, error)
          }
       })
    }
 
-   fileprivate func transitionToLive(completion: @escaping (Bool) -> Void) {
+   fileprivate func transitionToLive(completion: @escaping (Bool, YTError?) -> Void) {
       guard let liveBroadcast = self.liveBroadcast else {
          return
       }

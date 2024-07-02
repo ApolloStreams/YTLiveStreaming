@@ -219,7 +219,7 @@ extension YTLiveStreaming {
 
     public func getStatusBroadcast(_ broadcast: LiveBroadcastStreamModel,
                                    stream: LiveStreamModel,
-                                   completion: @escaping (String?, String?, String?) -> Void) {
+                                   completion: @escaping (String?, String?, String?, YTError?) -> Void) {
         YTLiveRequest.getLiveBroadcast(broadcastId: broadcast.id, completion: { result in
             switch result {
             case .success(let broadcast):
@@ -259,15 +259,15 @@ extension YTLiveStreaming {
                         //  noData – YouTube's live streaming backend servers do not have any information
                         //           about the stream's health status.
                         let healthStatus = liveStream.status.healthStatus.status
-                        completion(broadcastStatus, streamStatus, healthStatus)
+                        completion(broadcastStatus, streamStatus, healthStatus, nil)
                     case .failure(let error):
                         print(error.message())
-                        completion(nil, nil, nil)
+                        completion(nil, nil, nil, error)
                     }
                 })
             case .failure(let error):
                 print(error.message())
-                completion(nil, nil, nil)
+                completion(nil, nil, nil, error)
             }
         })
     }

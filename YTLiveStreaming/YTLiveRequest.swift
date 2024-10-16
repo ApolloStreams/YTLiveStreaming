@@ -407,13 +407,15 @@ extension YTLiveRequest {
     class func createLiveStream(_ title: String,
                                 description: String,
                                 streamName: String,
+                                resolution: ResolutionValue,
+                                frameRate: FrameRateValue,
                                 completion: @escaping (Result<LiveStreamModel, YTError>) -> Void) {
         getHeaders { headers in
             guard let headers = headers else {
                 completion(.failure(.message("OAuth token is not presented")))
                 return
             }
-            let jsonBody = CreateLiveStreamBody(title: title, description: description, streamName: streamName)
+          let jsonBody = CreateLiveStreamBody(title: title, description: description, streamName: streamName, resolution: resolution, frameRate: frameRate)
             guard let jsonData = try? JSONEncoder().encode(jsonBody),
                   let jsonString = String(data: jsonData, encoding: .utf8) else {
                 completion(.failure(.message("Failed while preparing request")))

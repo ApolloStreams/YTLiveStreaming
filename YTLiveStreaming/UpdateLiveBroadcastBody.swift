@@ -138,6 +138,12 @@ struct CreateLiveStreamBody: Codable {
             ingestionType = LiveAPI.IngestionType
             ingestionInfo = IngestionInfo(streamName: streamName)
         }
+      init(streamName: String, resolution: ResolutionValue, frameRate: FrameRateValue) {
+        self.resolution = resolution.rawValue
+        self.frameRate = frameRate.rawValue
+        ingestionType = LiveAPI.IngestionType
+        ingestionInfo = IngestionInfo(streamName: streamName)
+      }
     }
 
     let snippet: Snipped
@@ -147,6 +153,10 @@ struct CreateLiveStreamBody: Codable {
         snippet = Snipped(title: title, description: description)
         cdn = Cdn(streamName: streamName)
     }
+  init(title: String, description: String, streamName: String, resolution: ResolutionValue, frameRate: FrameRateValue) {
+      snippet = Snipped(title: title, description: description)
+      cdn = Cdn(streamName: streamName, resolution: resolution, frameRate: frameRate)
+  }
 }
 
 struct UpdateLiveStreamBody: Codable {

@@ -77,11 +77,17 @@ extension YTLiveStreaming {
     public func createBroadcast(_ title: String,
                                 description: String?,
                                 startTime: Date,
+                                resolution: String = "1080p",
+                                frameRate: String = "60fps",
                                 privacy: String? = nil,
                                 enableAutoStop: Bool? = nil,
                                 completion: @escaping (Result<LiveBroadcastStreamModel, YTError>) -> Void) {
         let liveStreamDescription = description ?? "This stream was created by the YTLiveStreaming iOS framework"
         let liveStreamName = "YTLiveStreaming"
+      guard let resolution =  ResolutionValue(rawValue: resolution), let frameRate = FrameRateValue(rawValue: frameRate) else {
+        completion(.failure(.message("Invalid resolution or frameRate")))
+        return
+      }
         YTLiveRequest.createLiveBroadcast(title, liveStreamDescription, startDateTime: startTime, privacy: privacy, enableAutoStop: enableAutoStop, completion: { result in
             switch result {
             case .success(let liveBroadcast):
@@ -89,7 +95,9 @@ extension YTLiveStreaming {
                 YTLiveRequest.createLiveStream(
                     title,
                     description: liveStreamDescription,
-                    streamName: liveStreamName
+                    streamName: liveStreamName,
+                    resolution: resolution,
+                    frameRate: frameRate
                 ) { result in
                     switch result {
                     case .success(let liveStream):

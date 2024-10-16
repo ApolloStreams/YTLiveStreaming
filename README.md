@@ -121,7 +121,8 @@ To integrate YTLiveStreaming package using Apple's Swift package manager
        } 
 
 	// Create Broadcast
-	input.createBroadcast(title, description: description, startTime: startDate, completion: { liveBroadcast in
+	input.createBroadcast(title, description: description, startTime: startDate, resolution: String = "1080p",
+                                frameRate: String = "60fps",, completion: { liveBroadcast in
 	   if let liveBroadcast = liveBroadcast {
 	      ...
 	   }

@@ -170,9 +170,23 @@ extension YTLiveRequest {
                             completion(.failure(.message(message)))
                         }
                     case .failure(let error):
-                        let code = error.responseCode ?? -1
-                        let message = error.errorDescription ?? error.localizedDescription
-                        completion(.failure(.systemMessage(code, message)))
+                        guard let statusCode = response.response?.statusCode else {
+                            let code = error.responseCode ?? -1
+                            let message = error.errorDescription ?? error.localizedDescription
+                            completion(.failure(.systemMessage(code, message)))
+                            return
+                        }
+                        guard let data = response.data else {
+                            completion(.failure(.message("create liveBroadcasts response is empty")))
+                            return
+                        }
+                        do {
+                            let json = try JSON(data: data)
+                            let apiError = "HTTP \(statusCode): Request failed"
+                            completion(.failure(.apiError(statusCode, apiError, json)))
+                        } catch {
+                            completion(.failure(.systemMessage(statusCode, error.localizedDescription)))
+                        }
                     }
                 }.cURLDescription { (description) in
                     print("\n====== REQUEST =======\n\(description)\n==============\n")
@@ -225,9 +239,23 @@ extension YTLiveRequest {
                             completion(.failure(.message(message)))
                         }
                     case .failure(let error):
-                        let code = error.responseCode ?? -1
-                        let message = error.errorDescription ?? error.localizedDescription
-                        completion(.failure(.systemMessage(code, message)))
+                        guard let statusCode = response.response?.statusCode else {
+                            let code = error.responseCode ?? -1
+                            let message = error.errorDescription ?? error.localizedDescription
+                            completion(.failure(.systemMessage(code, message)))
+                            return
+                        }
+                        guard let data = response.data else {
+                            completion(.failure(.message("update broadcast response is empty")))
+                            return
+                        }
+                        do {
+                            let json = try JSON(data: data)
+                            let apiError = "HTTP \(statusCode): Request failed"
+                            completion(.failure(.apiError(statusCode, apiError, json)))
+                        } catch {
+                            completion(.failure(.systemMessage(statusCode, error.localizedDescription)))
+                        }
                     }
             }.cURLDescription { (description) in
                 print("\n====== REQUEST =======\n\(description)\n==============\n")
@@ -462,7 +490,7 @@ extension YTLiveRequest {
                         let errorMessage = json["error"]["message"].stringValue
                         let errorType = json["error"]["errors"][0]["reason"].stringValue
                         let apiError = "\(statusCode): \(errorType) - \(errorMessage)"
-                        completion(.failure(.apiError(statusCode, apiError)))
+                        completion(.failure(.apiError(statusCode, apiError, json)))
                       } catch {
                         completion(.failure(.systemMessage(statusCode, error.localizedDescription)))
                       }
@@ -556,9 +584,23 @@ extension YTLiveRequest {
                             completion(.failure(.message(message)))
                         }
                     case .failure(let error):
-                        let code = error.responseCode ?? -1
-                        let message = error.errorDescription ?? error.localizedDescription
-                        completion(.failure(.systemMessage(code, message)))
+                        guard let statusCode = response.response?.statusCode else {
+                            let code = error.responseCode ?? -1
+                            let message = error.errorDescription ?? error.localizedDescription
+                            completion(.failure(.systemMessage(code, message)))
+                            return
+                        }
+                        guard let data = response.data else {
+                            completion(.failure(.message("updateLiveStream response is empty")))
+                            return
+                        }
+                        do {
+                            let json = try JSON(data: data)
+                            let apiError = "HTTP \(statusCode): Request failed"
+                            completion(.failure(.apiError(statusCode, apiError, json)))
+                        } catch {
+                            completion(.failure(.systemMessage(statusCode, error.localizedDescription)))
+                        }
                     }
                 }.cURLDescription { (description) in
                     print("\n====== REQUEST =======\n\(description)\n==============\n")
